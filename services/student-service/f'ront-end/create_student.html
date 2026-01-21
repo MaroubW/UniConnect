@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Student • Admin Console</title>
+
+    <!-- Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="style/style_create.css">
+</head>
+<body>
+<div class="shell">
+    <!-- LEFT: Hero + Preview -->
+    <section class="left">
+        <div class="left-header">
+            <div class="brand">
+                <div class="brand-logo">ST</div>
+                <div>
+                    <h1>Student Console</h1>
+                    <div class="brand-subtitle">Admin environment</div>
+                </div>
+            </div>
+            <div class="tag">Create Mode</div>
+        </div>
+
+        <div class="title-block">
+            <h2>Create a new student</h2>
+            <p>Type the details on the right and preview the student profile here in real time before saving.</p>
+
+            <div class="stats-row">
+                <div class="chip">
+                    <span class="chip-dot"></span>
+                    Live preview
+                </div>
+                <div class="chip">
+                    <span class="chip-pill">API: /students</span>
+                    POST
+                </div>
+                <div class="chip">
+                    Auto status &amp; validation
+                </div>
+            </div>
+        </div>
+
+        <div class="preview-card" id="preview-card">
+            <div class="preview-header">
+                <div class="preview-main">
+                    <div class="avatar" id="preview-avatar">ST</div>
+                    <div class="preview-text">
+                        <div class="preview-name" id="preview-name">New Student</div>
+                        <div class="preview-email" id="preview-email">email@domain.tld</div>
+                    </div>
+                </div>
+                <span class="status-pill" id="preview-status">Active</span>
+            </div>
+
+            <div class="preview-meta">
+                <span class="badge-soft" id="preview-number"># —</span>
+                <span class="badge-soft" id="preview-dept">Dept —</span>
+                <span class="badge-soft" id="preview-level">Level —</span>
+            </div>
+
+            <div class="preview-footer">
+                <span id="preview-dob">Birth date: —</span>
+                <span id="preview-id">New record</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- RIGHT: Form -->
+    <section class="right">
+        <div class="right-header">
+            <div>
+                <h2>Student details</h2>
+                <p>All fields marked with <span class="required-star">*</span> are required.</p>
+            </div>
+            <div class="badge-small">
+                <span class="badge-dot"></span>
+                Connected to API
+            </div>
+        </div>
+
+        <form id="student-form">
+            <div class="field">
+                <label for="studentNumber">Student Number <span>*</span></label>
+                <input id="studentNumber" name="studentNumber" type="text" required
+                       placeholder="2025-GL-001">
+                <small>Use your standard format, e.g. <code>YYYY-DEP-XXX</code>.</small>
+            </div>
+
+            <div class="field">
+                <label for="email">Email <span>*</span></label>
+                <input id="email" name="email" type="email" required
+                       placeholder="student@example.com">
+                <small>Must be a valid email address.</small>
+            </div>
+
+            <div class="field">
+                <label for="firstName">First Name <span>*</span></label>
+                <input id="firstName" name="firstName" type="text" required
+                       placeholder="Ali">
+            </div>
+
+            <div class="field">
+                <label for="lastName">Last Name <span>*</span></label>
+                <input id="lastName" name="lastName" type="text" required
+                       placeholder="Ben Salah">
+            </div>
+
+            <div class="field">
+                <label for="dateOfBirth">Date of Birth <span>*</span></label>
+                <input id="dateOfBirth" name="dateOfBirth" type="date" required>
+            </div>
+
+            <div class="field">
+                <label for="department">Department <span>*</span></label>
+                <select id="department" name="department" required>
+                    <option value="">Select department</option>
+                    <option value="GL">GL</option>
+                    <option value="RT">RT</option>
+                    <option value="INFO">INFO</option>
+                    <option value="INDUS">INDUS</option>
+                </select>
+            </div>
+
+            <div class="field">
+                <label for="level">Level <span>*</span></label>
+                <select id="level" name="level" required>
+                    <option value="">Select level</option>
+                    <option value="1ere annee">1ère année</option>
+                    <option value="2eme annee">2ème année</option>
+                    <option value="3eme annee">3ème année</option>
+                    <option value="4eme annee">4ème année</option>
+                </select>
+            </div>
+
+            <div class="field">
+                <label>Status</label>
+                <!-- IMPORTANT: .active here is the default ON state -->
+                <label class="toggle active" id="statusToggle">
+                    <input id="isActive" name="isActive" type="checkbox" checked>
+                    <div class="toggle-pill">
+                        <div class="toggle-thumb"></div>
+                    </div>
+                    <span class="toggle-text" id="statusToggleText">Active</span>
+                </label>
+            </div>
+
+            <div class="helper-row">
+                <span>Tip: <strong>Preview</strong> will always mirror what you type.</span>
+                <span class="helper-pill">Press Enter or click “Create student” to submit.</span>
+            </div>
+
+            <div class="actions">
+                <button type="button" class="btn-secondary" id="resetBtn">
+                    Reset
+                </button>
+                <button id="submitBtn" type="submit" class="btn-primary">
+                    <span>➕</span>
+                    Create student
+                </button>
+            </div>
+
+            <div class="status-bar" id="statusBar">
+                <div class="status-inner" id="statusInner"></div>
+            </div>
+        </form>
+    </section>
+</div>
+
+<!-- JS -->
+<script src="controller/script_create.js"></script>
+</body>
+</html>

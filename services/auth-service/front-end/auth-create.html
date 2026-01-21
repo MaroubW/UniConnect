@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create User • Auth Console</title>
+
+    <!-- Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="style/auth-create.css">
+</head>
+<body>
+<div class="shell">
+    <!-- LEFT: Hero + Preview -->
+    <section class="left">
+        <div class="left-header">
+            <div class="brand">
+                <div class="brand-logo">AU</div>
+                <div>
+                    <h1>Auth Console</h1>
+                    <div class="brand-sub">User accounts</div>
+                </div>
+            </div>
+            <div class="tag">Create User</div>
+        </div>
+
+        <div class="title-block">
+            <h2>Create a new user</h2>
+            <p>Fill in the user identity and access level, and preview the account profile in real time before saving.</p>
+
+            <div class="chips-row">
+                <div class="chip">
+                    <span class="chip-dot"></span>
+                    Live preview
+                </div>
+                <div class="chip">
+                    <span class="chip-pill">API: /auth/register</span>
+                    POST
+                </div>
+                <div class="chip">
+                    Password validation
+                </div>
+            </div>
+        </div>
+
+        <!-- Preview card -->
+        <div class="preview-card" id="preview-card">
+            <div class="preview-header">
+                <div class="preview-main">
+                    <div class="avatar" id="preview-avatar">AU</div>
+                    <div class="preview-text">
+                        <div class="preview-name" id="preview-name">New User</div>
+                        <div class="preview-email" id="preview-email">user@example.com</div>
+                    </div>
+                </div>
+                <span class="status-pill" id="preview-status">Active</span>
+            </div>
+
+            <div class="preview-meta">
+                <span class="badge-soft" id="preview-role">Role —</span>
+                <span class="badge-soft" id="preview-username">Username —</span>
+            </div>
+
+            <div class="preview-footer">
+                <span id="preview-created">Will be created on first save</span>
+                <span id="preview-id">New account</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- RIGHT: Form -->
+    <section class="right">
+        <div class="right-header">
+            <div>
+                <h2>User details</h2>
+                <p>All fields marked with <span class="required">*</span> are required.</p>
+            </div>
+            <div class="badge-small">
+                <span class="badge-dot"></span>
+                Connected to Auth API
+            </div>
+        </div>
+
+        <form id="user-form">
+            <div class="field">
+                <label for="email">Email <span class="required">*</span></label>
+                <input id="email" name="email" type="email" required
+                       placeholder="user@example.com">
+                <small>Must be a valid email address. This will be used for login.</small>
+            </div>
+
+            <div class="field">
+                <label for="username">Username</label>
+                <input id="username" name="username" type="text"
+                       placeholder="optional username">
+                <small>Leave empty to generate from email.</small>
+            </div>
+
+            <div class="field">
+                <label for="firstName">First name</label>
+                <input id="firstName" name="firstName" type="text"
+                       placeholder="Ali">
+            </div>
+
+            <div class="field">
+                <label for="lastName">Last name</label>
+                <input id="lastName" name="lastName" type="text"
+                       placeholder="Ben Salah">
+            </div>
+
+            <div class="field">
+                <label for="password">Password <span class="required">*</span></label>
+                <input id="password" name="password" type="password" required
+                       placeholder="At least 8 characters">
+                <small>Use at least 8 characters, mixing letters and numbers.</small>
+            </div>
+
+            <div class="field">
+                <label for="confirmPassword">Confirm password <span class="required">*</span></label>
+                <input id="confirmPassword" name="confirmPassword" type="password" required
+                       placeholder="Repeat password">
+            </div>
+
+            <div class="field">
+                <label for="role">Role <span class="required">*</span></label>
+                <select id="role" name="role" required>
+                    <option value="">Select role</option>
+                    <option value="ADMIN">Admin</option>
+                    <option value="TEACHER">Teacher</option>
+                    <option value="MANAGER">Manager</option>
+                    <option value="STUDENT">Student</option>
+                </select>
+            </div>
+
+            <div class="field">
+                <label>Status</label>
+                <!-- The whole label is clickable (wraps the checkbox + pill + text) -->
+                <label class="toggle active" id="statusToggle">
+                    <input id="isActive"
+                           name="enabled"
+                           type="checkbox"
+                           checked>
+                    <div class="toggle-pill">
+                        <div class="toggle-thumb"></div>
+                    </div>
+                    <span class="toggle-text" id="statusToggleText">Active</span>
+                </label>
+            </div>
+
+            <div class="helper-row">
+                <span>Tip: <strong>Preview</strong> mirrors what you type.</span>
+                <span class="helper-pill">Press Enter or “Create user” to submit.</span>
+            </div>
+
+            <div class="actions">
+                <button type="button" class="btn-secondary" id="resetBtn">
+                    Reset
+                </button>
+                <button id="submitBtn" type="submit" class="btn-primary">
+                    <span>➕</span>
+                    Create user
+                </button>
+            </div>
+
+            <div class="status-bar" id="statusBar">
+                <div class="status-inner" id="statusInner"></div>
+            </div>
+        </form>
+    </section>
+</div>
+
+<script src="auth-create.js"></script>
+</body>
+</html>

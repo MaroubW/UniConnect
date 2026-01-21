@@ -1,0 +1,801 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Billing Service – SOA Portal</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <style>
+    :root {
+      font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      color-scheme: light;
+
+      --bg: #020617;
+      --accent: #4f46e5;
+      --accent-soft: #eef2ff;
+      --accent-green: #22c55e;
+      --border: #e5e7eb;
+      --text: #0f172a;
+      --text-muted: #6b7280;
+    }
+
+    /* GLOBAL */
+
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      align-items: stretch;
+      justify-content: center;
+      padding: 20px;
+      background:
+        radial-gradient(circle at top left, rgba(79, 70, 229, 0.4), transparent 55%),
+        radial-gradient(circle at bottom right, rgba(34, 197, 94, 0.4), transparent 55%),
+        var(--bg);
+      color: var(--text);
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    /* SHELL */
+
+    .shell {
+      width: 100%;
+      max-width: 1080px;
+      border-radius: 24px;
+      background:
+        radial-gradient(circle at top left, rgba(255, 255, 255, 0.96), #f3f4f6);
+      box-shadow:
+        0 26px 70px rgba(15, 23, 42, 0.7),
+        0 0 0 1px rgba(148, 163, 184, 0.25);
+      overflow: hidden;
+      display: grid;
+      grid-template-columns: minmax(0, 1.1fr) minmax(0, 1.3fr);
+    }
+
+    /* LEFT PANEL */
+
+    .left {
+      position: relative;
+      padding: 26px 26px 20px;
+      background: radial-gradient(circle at top left, #4f46e5, #1d4ed8);
+      color: white;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    .left::before,
+    .left::after {
+      content: "";
+      position: absolute;
+      border-radius: 999px;
+      filter: blur(28px);
+      opacity: 0.7;
+      pointer-events: none;
+    }
+
+    .left::before {
+      width: 150px;
+      height: 150px;
+      background: rgba(56, 189, 248, 0.8);
+      top: -40px;
+      right: -40px;
+    }
+
+    .left::after {
+      width: 110px;
+      height: 110px;
+      background: rgba(22, 163, 74, 0.7);
+      bottom: -40px;
+      left: -30px;
+    }
+
+    .left-header,
+    .title-block,
+    .preview-card {
+      position: relative;
+      z-index: 1;
+    }
+
+    .left-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .brand-logo {
+      width: 32px;
+      height: 32px;
+      border-radius: 12px;
+      background: conic-gradient(from 200deg, #22c55e, #a855f7, #f97316, #22c55e);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: white;
+      box-shadow: 0 10px 22px rgba(15, 23, 42, 0.6);
+    }
+
+    .brand h1 {
+      margin: 0;
+      font-size: 1rem;
+      font-weight: 600;
+    }
+
+    .brand-sub {
+      font-size: 0.72rem;
+      opacity: 0.9;
+    }
+
+    .tag {
+      font-size: 0.72rem;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.3);
+      border: 1px solid rgba(148, 163, 184, 0.7);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .title-block h2 {
+      margin: 4px 0 0;
+      font-size: 1.5rem;
+      font-weight: 700;
+    }
+
+    .title-block p {
+      margin: 8px 0 0;
+      font-size: 0.9rem;
+      opacity: 0.92;
+    }
+
+    .chips-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .chip {
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      background: rgba(15, 23, 42, 0.25);
+      border: 1px solid rgba(148, 163, 184, 0.7);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .chip-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 999px;
+      background: #22c55e;
+      box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.3);
+    }
+
+    .chip-pill {
+      padding: 2px 7px;
+      border-radius: 999px;
+      font-size: 0.7rem;
+      background: rgba(15, 23, 42, 0.55);
+    }
+
+    /* PREVIEW CARD */
+
+    .preview-card {
+      margin-top: auto;
+      border-radius: 18px;
+      padding: 14px 14px 12px;
+      background:
+        radial-gradient(circle at top left, rgba(148, 163, 184, 0.4), transparent 55%),
+        rgba(15, 23, 42, 0.78);
+      border: 1px solid rgba(148, 163, 184, 0.35);
+      box-shadow: 0 10px 22px rgba(15, 23, 42, 0.6);
+    }
+
+    .preview-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 10px;
+    }
+
+    .preview-main {
+      display: flex;
+      gap: 10px;
+    }
+
+    .avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 12px;
+      background: radial-gradient(circle at top left, #22c55e, #0ea5e9);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: white;
+    }
+
+    .preview-text {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .preview-name {
+      font-size: 0.98rem;
+      font-weight: 600;
+    }
+
+    .preview-email {
+      font-size: 0.78rem;
+      opacity: 0.9;
+    }
+
+    .preview-meta {
+      margin-top: 6px;
+      font-size: 0.75rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .badge-soft {
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.4);
+      border: 1px solid rgba(148, 163, 184, 0.6);
+    }
+
+    .status-pill {
+      padding: 2px 10px;
+      border-radius: 999px;
+      font-size: 0.72rem;
+      font-weight: 500;
+      background: rgba(22, 163, 74, 0.15);
+      color: #bbf7d0;
+      border: 1px solid rgba(34, 197, 94, 0.7);
+    }
+
+    .preview-footer {
+      margin-top: 10px;
+      padding-top: 8px;
+      border-top: 1px dashed rgba(148, 163, 184, 0.6);
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.72rem;
+      color: #cbd5f5;
+      opacity: 0.85;
+    }
+
+    /* RIGHT PANEL */
+
+    .right {
+      padding: 24px 24px 22px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      background: #fefefe;
+    }
+
+    .right-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 10px;
+    }
+
+    .right-header h2 {
+      margin: 0;
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .right-header p {
+      margin: 4px 0 0;
+      font-size: 0.86rem;
+      color: var(--text-muted);
+    }
+
+    .badge-small {
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: #e5e7eb;
+      color: #4b5563;
+      font-size: 0.74rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .badge-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: var(--accent-green);
+    }
+
+    /* NAV / LINKS */
+
+    .nav-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.86rem;
+      color: var(--text-muted);
+    }
+
+    .nav-links {
+      display: inline-flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .nav-link {
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: #eef2ff;
+      color: #312e81;
+      font-size: 0.8rem;
+      border: 1px solid #c7d2fe;
+    }
+
+    .nav-link.outline {
+      background: #ffffff;
+      color: #4b5563;
+      border-color: #d1d5db;
+    }
+
+    /* FORM */
+
+    form {
+      margin-top: 8px;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px 16px;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .field.full {
+      grid-column: 1 / -1;
+    }
+
+    .field label {
+      font-size: 0.86rem;
+      font-weight: 500;
+      color: #374151;
+    }
+
+    .field small {
+      font-size: 0.74rem;
+      color: #9ca3af;
+    }
+
+    .field input,
+    .field select {
+      padding: 8px 10px;
+      border-radius: 10px;
+      border: 1px solid #d1d5db;
+      font-size: 0.86rem;
+      outline: none;
+      background: #f9fafb;
+      transition: border-color 0.14s ease, box-shadow 0.14s ease,
+                  background 0.14s ease, transform 0.08s ease;
+    }
+
+    .field input:focus,
+    .field select:focus {
+      border-color: var(--accent);
+      background: #ffffff;
+      box-shadow: 0 0 0 1px rgba(79, 70, 229, 0.24);
+      transform: translateY(-1px);
+    }
+
+    .actions {
+      grid-column: 1 / -1;
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 6px;
+    }
+
+    button {
+      border-radius: 999px;
+      border: none;
+      padding: 9px 16px;
+      font-size: 0.88rem;
+      font-weight: 500;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: transform 0.1s ease, box-shadow 0.1s ease,
+                  background 0.1s ease, opacity 0.1s ease;
+    }
+
+    .btn-secondary {
+      background: #ffffff;
+      color: #4b5563;
+      border: 1px solid #d1d5db;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #4f46e5, #6366f1);
+      color: white;
+      box-shadow: 0 1px 4px rgba(79, 70, 229, 0.5);
+    }
+
+    button:hover:not(:disabled) {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 8px rgba(15, 23, 42, 0.2);
+    }
+
+    button:disabled {
+      opacity: 0.7;
+      cursor: default;
+      transform: none;
+      box-shadow: none;
+    }
+
+    /* BILLING SUMMARY + TABLE */
+
+    .billing-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-top: 10px;
+      font-size: 0.86rem;
+      color: var(--text-muted);
+    }
+
+    .billing-summary {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .summary-chip {
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 0.78rem;
+      background: var(--accent-soft);
+      color: #1e3a8a;
+      border: 1px solid #c7d2fe;
+    }
+
+    .table-wrapper {
+      margin-top: 10px;
+      border-radius: 16px;
+      background: #ffffff;
+      border: 1px solid var(--border);
+      box-shadow:
+        0 8px 18px rgba(15, 23, 42, 0.06),
+        0 0 0 1px rgba(148, 163, 184, 0.08);
+      overflow: hidden;
+    }
+
+    .table-header {
+      padding: 10px 12px;
+      border-bottom: 1px solid #e5e7eb;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.84rem;
+    }
+
+    .table-scroll {
+      max-height: 240px;
+      overflow: auto;
+    }
+
+    .billing-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.84rem;
+    }
+
+    .billing-table thead {
+      background: #f9fafb;
+    }
+
+    .billing-table th,
+    .billing-table td {
+      padding: 8px 10px;
+      text-align: left;
+      border-bottom: 1px solid #e5e7eb;
+    }
+
+    .billing-table th {
+      font-size: 0.78rem;
+      font-weight: 500;
+      color: var(--text-muted);
+    }
+
+    .billing-table tr:hover {
+      background: #eef2ff;
+    }
+
+    .badge-status {
+      display: inline-flex;
+      align-items: center;
+      padding: 3px 9px;
+      border-radius: 999px;
+      font-size: 0.72rem;
+      font-weight: 500;
+    }
+
+    .badge-status.paid {
+      background: #ecfdf5;
+      color: #15803d;
+      border: 1px solid #bbf7d0;
+    }
+
+    .badge-status.unpaid {
+      background: #fef2f2;
+      color: #b91c1c;
+      border: 1px solid #fecaca;
+    }
+
+    .btn-table {
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 0.76rem;
+      border: 1px solid #d1d5db;
+      background: #ffffff;
+      color: #374151;
+    }
+
+    .btn-table:hover {
+      background: #eef2ff;
+      border-color: #c7d2fe;
+    }
+
+    .helper-text {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    /* RESPONSIVE */
+
+    @media (max-width: 860px) {
+      .shell {
+        grid-template-columns: minmax(0, 1fr);
+        max-width: 680px;
+      }
+
+      .preview-card {
+        margin-top: 12px;
+      }
+    }
+
+    @media (max-width: 520px) {
+      body { padding: 0; }
+      .shell { border-radius: 0; box-shadow: none; }
+      .right { padding: 18px 16px 20px; }
+      .left { padding: 18px 16px 16px; }
+      form { grid-template-columns: minmax(0, 1fr); }
+    }
+  </style>
+</head>
+<body>
+
+<div class="shell">
+  <!-- LEFT PANEL -->
+  <aside class="left">
+    <div class="left-header">
+      <div class="brand">
+        <div class="brand-logo">B</div>
+        <div>
+          <h1>Billing Service</h1>
+          <div class="brand-sub">SOA University Platform</div>
+        </div>
+      </div>
+      <span class="tag">API Gateway · Microservices</span>
+    </div>
+
+    <div class="title-block">
+      <h2>Manage tuition, invoices & payments.</h2>
+      <p>
+        This front-end talks only to the API Gateway.
+        The gateway routes requests to your Billing, Student and Auth services.
+      </p>
+
+      <div class="chips-row">
+        <span class="chip">
+          <span class="chip-dot"></span>
+          Connected to /api/billing
+        </span>
+        <span class="chip">
+          <span class="chip-pill">Invoice · Payment · Balance</span>
+        </span>
+      </div>
+    </div>
+
+    <!-- Preview example -->
+    <div class="preview-card">
+      <div class="preview-header">
+        <div class="preview-main">
+          <div class="avatar">JD</div>
+          <div class="preview-text">
+            <div class="preview-name">John Doe</div>
+            <div class="preview-email">john.doe@student.univ.tn</div>
+            <div class="preview-meta">
+              <span class="badge-soft">Student ID: 1024</span>
+              <span class="status-pill">Balance: 420.00 TND</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="preview-footer">
+        <span>Last invoice: INV-2025-001 · Unpaid</span>
+        <span>Due: 30/06/2025</span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- RIGHT PANEL -->
+  <main class="right">
+    <div class="right-header">
+      <div>
+        <h2>Invoices & Payments</h2>
+        <p>Use this form to create invoices and record payments for students.</p>
+      </div>
+      <span class="badge-small">
+        <span class="badge-dot"></span>
+        Gateway: /api/billing
+      </span>
+    </div>
+
+    <div class="nav-row">
+      <div class="nav-links">
+        <a class="nav-link outline" href="/services/student-service/f'ront-end/dashbord.html">Students</a>
+        <a class="nav-link" href="dash.html">Billing</a>
+      </div>
+      <span class="helper-text">Later you will plug this into real endpoints.</span>
+    </div>
+
+    <!-- FORM -->
+    <section>
+      <form>
+        <div class="field full">
+          <label for="studentSelect">Student</label>
+          <select id="studentSelect">
+            <option value="">Select a student…</option>
+            <option value="1">John Doe (john.doe@student.univ.tn)</option>
+            <option value="2">Jane Smith (jane.smith@student.univ.tn)</option>
+          </select>
+          <small>The student list will come from the Student service via the gateway.</small>
+        </div>
+
+        <div class="field">
+          <label for="invoiceAmount">Invoice amount (TND)</label>
+          <input type="number" step="0.01" id="invoiceAmount" placeholder="e.g. 350.00" />
+        </div>
+
+        <div class="field">
+          <label for="invoiceDueDate">Due date</label>
+          <input type="date" id="invoiceDueDate" />
+        </div>
+
+        <div class="field">
+          <label for="invoiceStatus">Invoice status</label>
+          <select id="invoiceStatus">
+            <option value="Unpaid">Unpaid</option>
+            <option value="Paid">Paid</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="paymentAmount">Payment amount (optional)</label>
+          <input type="number" step="0.01" id="paymentAmount" placeholder="e.g. 200.00" />
+        </div>
+
+        <div class="field">
+          <label for="paymentMethod">Payment method</label>
+          <input type="text" id="paymentMethod" placeholder="Card, cash, transfer…" />
+        </div>
+
+        <div class="field">
+          <label for="paymentDate">Payment date</label>
+          <input type="date" id="paymentDate" />
+        </div>
+
+        <div class="actions">
+          <button type="reset" class="btn-secondary">Reset</button>
+          <button type="submit" class="btn-primary">Save invoice</button>
+        </div>
+      </form>
+    </section>
+
+    <!-- SUMMARY + TABLE -->
+    <section>
+      <div class="billing-header">
+        <div>Invoices for selected student</div>
+        <div class="billing-summary">
+          <span class="summary-chip">
+            Unpaid: <strong>2</strong>
+          </span>
+          <span class="summary-chip">
+            Total unpaid: <strong>770.00 TND</strong>
+          </span>
+        </div>
+      </div>
+
+      <div class="table-wrapper">
+        <div class="table-header">
+          <span>Recent invoices</span>
+          <span class="helper-text">Table data will come from /api/billing/invoices.</span>
+        </div>
+        <div class="table-scroll">
+          <table class="billing-table">
+            <thead>
+            <tr>
+              <th>#</th>
+              <th>Amount</th>
+              <th>Due</th>
+              <th>Status</th>
+              <th>Created</th>
+              <th>Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+              <td>INV-2025-001</td>
+              <td>420.00</td>
+              <td>30/06/2025</td>
+              <td><span class="badge-status unpaid">Unpaid</span></td>
+              <td>01/06/2025</td>
+              <td><button class="btn-table" type="button">Mark paid</button></td>
+            </tr>
+            <tr>
+              <td>INV-2025-002</td>
+              <td>350.00</td>
+              <td>15/07/2025</td>
+              <td><span class="badge-status paid">Paid</span></td>
+              <td>10/06/2025</td>
+              <td><button class="btn-table" type="button">Details</button></td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+</body>
+</html>

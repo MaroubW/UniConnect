@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Students • Admin Console</title>
+
+    <!-- Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- External CSS -->
+    <link rel="stylesheet" href="style/style_dashboard.css">
+</head>
+<body>
+<div class="shell">
+    <!-- LEFT: summary panel -->
+    <section class="left">
+        <div class="brand-row">
+            <div class="brand">
+                <div class="brand-logo">ST</div>
+                <div>
+                    <h1>Student Console</h1>
+                    <div class="brand-sub">Overview &amp; browsing</div>
+                </div>
+            </div>
+            <div class="tag">List view</div>
+        </div>
+
+        <div class="title-block">
+            <h2>Browse all students</h2>
+            <p>Search, filter, and scan through your student records powered by <code>GET /students</code>.</p>
+
+            <div class="chips-row">
+                <div class="chip">
+                    <span class="chip-dot"></span>
+                    Live search
+                </div>
+                <div class="chip">Client-side filters</div>
+                <div class="chip">Instant stats</div>
+            </div>
+        </div>
+
+        <div class="stat-cards">
+            <div class="stat-card">
+                <div class="stat-label">Total students</div>
+                <div class="stat-value" id="statTotal">—</div>
+                <div class="stat-pill">
+                    <span class="stat-pill-dot"></span>
+                    Page <span id="statPage">—</span>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Active students</div>
+                <div class="stat-value" id="statActive">—</div>
+                <div class="stat-pill">
+                    <span class="stat-pill-dot"></span>
+                    Filtered: <span id="statFiltered">—</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- RIGHT: list panel -->
+    <section class="right">
+        <div class="right-header">
+            <div>
+                <h2>Students</h2>
+                <p>Use the controls below to narrow down the list.</p>
+            </div>
+            <div class="badge-small">
+                <span class="badge-dot"></span>
+                Connected to API
+            </div>
+        </div>
+
+        <div class="toolbar">
+            <div class="search-box">
+                <span class="search-icon">🔍</span>
+                <input id="searchInput" type="text" placeholder="Search by name or email…">
+            </div>
+
+            <select id="deptFilter" class="select">
+                <option value="">All departments</option>
+                <option value="GL">GL</option>
+                <option value="RT">RT</option>
+                <option value="INFO">INFO</option>
+                <option value="INDUS">INDUS</option>
+            </select>
+
+            <select id="levelFilter" class="select">
+                <option value="">All levels</option>
+                <option value="1ere annee">1ère année</option>
+                <option value="2eme annee">2ème année</option>
+                <option value="3eme annee">3ème année</option>
+                <option value="4eme annee">4ème année</option>
+            </select>
+
+            <!-- ACTIVE ONLY TOGGLE -->
+            <label class="toggle-chip" id="activeToggle">
+                <input type="checkbox" id="activeOnly">
+                <div class="toggle-chip-pill">
+                    <div class="toggle-chip-thumb"></div>
+                </div>
+                <span class="toggle-chip-text">Active only</span>
+            </label>
+
+            <button class="btn-refresh" id="refreshBtn">
+                <span>⟳</span> Refresh
+            </button>
+        </div>
+
+        <div class="panel">
+            <div class="panel-header-row">
+                <small id="subtitle">Loading students…</small>
+                <span class="badge-compact" id="apiInfo">Using /students</span>
+            </div>
+
+            <div class="loader" id="loader"></div>
+            <div class="error-box" id="errorBox"></div>
+
+            <div class="list" id="listContainer">
+                <div class="list-header">
+                    <div>Student #</div>
+                    <div>Name</div>
+                    <div>Email</div>
+                    <div>Department</div>
+                    <div>Status</div>
+                </div>
+                <div id="listBody"></div>
+            </div>
+
+            <div class="empty" id="emptyMessage">
+                No students match your filters.
+            </div>
+
+            <div class="pagination" id="pagination">
+                <div>
+                    Showing <span class="pager-info-strong" id="shownCount">0</span> of
+                    <span class="pager-info-strong" id="totalCount">0</span> students
+                    <span id="filterNote"></span>
+                </div>
+                <div class="pager-btns">
+                    <button class="pager-btn" id="prevBtn">Previous</button>
+                    <button class="pager-btn" id="nextBtn">Next</button>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+
+<!-- External JS -->
+<script src="controller/script_dashboard.js"></script>
+</body>
+</html>

@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Course Service – SOA Portal</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <script src="course.js"></script>
+  <!-- Same CSS as your other pages -->
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<div class="shell">
+  <!-- LEFT PANEL -->
+  <aside class="left">
+    <div class="left-header">
+      <div class="brand">
+        <div class="brand-logo">C</div>
+        <div>
+          <h1>Course Service</h1>
+          <div class="brand-sub">SOA University Platform</div>
+        </div>
+      </div>
+      <span class="tag">SOAP · Courses · Schedule</span>
+    </div>
+
+    <div class="title-block">
+      <h2>Browse and manage university courses.</h2>
+      <p>
+        This UI uses the API Gateway to talk to the Course SOAP service,
+        returning <strong>Course</strong>, <strong>Schedule</strong> and
+        <strong>CourseListResponse</strong> objects.
+      </p>
+
+      <div class="chips-row">
+        <span class="chip">
+          <span class="chip-dot"></span>
+          Endpoint: /api/courses
+        </span>
+        <span class="chip">
+          <span class="chip-pill">Course · Schedule</span>
+        </span>
+      </div>
+    </div>
+
+    <!-- Preview example (still static demo, optional to make dynamic later) -->
+    <div class="preview-card">
+      <div class="preview-header">
+        <div class="preview-main">
+          <div class="avatar">CS</div>
+          <div class="preview-text">
+            <div class="preview-name">SOA 301 – Service-Oriented Architectures</div>
+            <div class="preview-email">Prof. Ahmed Ben Salem</div>
+            <div class="preview-meta">
+              <span class="badge-soft">Code: SOA301</span>
+              <span class="badge-soft">Credits: 3</span>
+              <span class="status-pill">Semester: Spring</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="preview-footer">
+        <span>Capacity: 40 · Enrolled: 32</span>
+        <span>Next session: Mon 10:00–12:00</span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- RIGHT PANEL -->
+  <main class="right">
+    <div class="right-header">
+      <div>
+        <h2>Courses & Schedule</h2>
+        <p>Create, update and inspect courses and their weekly schedule.</p>
+      </div>
+      <span class="badge-small">
+        <span class="badge-dot"></span>
+        Gateway: /api/courses
+      </span>
+    </div>
+
+    <!-- top nav like other services -->
+    <div class="nav-row">
+      <div class="nav-links">
+        <a class="nav-link outline" href="/services/student-service/f'ront-end/dashbord.html">Students</a>
+        <a class="nav-link" href="/services/grade-service/front-end/dasho.html">grade</a>
+        <a class="nav-link outline" href="/services/billing-service/services/billing-service/BillingService/front-end/dash.html">Billing</a>
+      </div>
+      <span class="helper-text">Now plugged into real SOAP endpoints via the gateway.</span>
+    </div>
+
+    <!-- COURSE FORM -->
+    <section>
+      <form id="courseForm">
+        <div class="field full">
+          <label for="courseSelect">Select course</label>
+          <select id="courseSelect">
+            <option value="">New course…</option>
+            <!-- JS will inject existing courses here -->
+          </select>
+          <small>Use this dropdown to edit an existing course or leave on “New course…” to create a new one.</small>
+        </div>
+
+        <div class="field">
+          <label for="courseCode">Course code</label>
+          <input id="courseCode" type="text" placeholder="e.g. SOA301" />
+        </div>
+
+        <div class="field">
+          <label for="courseName">Course name</label>
+          <input id="courseName" type="text" placeholder="e.g. Service-Oriented Architectures" />
+        </div>
+
+        <div class="field">
+          <label for="courseCredits">Credits</label>
+          <input id="courseCredits" type="number" min="1" max="10" placeholder="3" />
+        </div>
+
+        <div class="field">
+          <label for="courseSemester">Semester</label>
+          <input id="courseSemester" type="text" placeholder="Fall, Spring…" />
+        </div>
+
+        <div class="field">
+          <label for="professorName">Professor name</label>
+          <input id="professorName" type="text" placeholder="Prof. Name Surname" />
+        </div>
+
+        <div class="field">
+          <label for="courseCapacity">Capacity</label>
+          <input id="courseCapacity" type="number" min="1" placeholder="40" />
+        </div>
+
+        <div class="field">
+          <label for="enrolledStudents">Enrolled students</label>
+          <input id="enrolledStudents" type="number" min="0" placeholder="(read-only from service)" disabled />
+          <small>When connected, this will be filled from the CourseResponse.</small>
+        </div>
+
+        <div class="actions">
+          <button type="reset" class="btn-secondary">Reset</button>
+          <button type="submit" class="btn-primary">Save course</button>
+        </div>
+      </form>
+    </section>
+
+    <!-- SCHEDULE FORM + TABLE -->
+    <section>
+      <div class="billing-header">
+        <div>Weekly schedule for this course</div>
+        <div class="billing-summary">
+          <span class="summary-chip">You can add multiple sessions per week</span>
+        </div>
+      </div>
+
+      <!-- schedule add form (uses Schedule fields) -->
+      <form id="scheduleForm">
+        <div class="field">
+          <label for="dayOfWeek">Day of week</label>
+          <select id="dayOfWeek">
+            <option value="">Select…</option>
+            <option>Monday</option>
+            <option>Tuesday</option>
+            <option>Wednesday</option>
+            <option>Thursday</option>
+            <option>Friday</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="startTime">Start time</label>
+          <input id="startTime" type="time" />
+        </div>
+
+        <div class="field">
+          <label for="endTime">End time</label>
+          <input id="endTime" type="time" />
+        </div>
+
+        <div class="field">
+          <label for="room">Room</label>
+          <input id="room" type="text" placeholder="e.g. B204" />
+        </div>
+
+        <div class="field">
+          <label for="building">Building</label>
+          <input id="building" type="text" placeholder="e.g. Main Campus" />
+        </div>
+
+        <div class="actions">
+          <button type="reset" class="btn-secondary">Clear</button>
+          <button type="submit" class="btn-primary">Add to schedule</button>
+        </div>
+      </form>
+
+      <!-- schedule table -->
+      <div class="table-wrapper">
+        <div class="table-header">
+          <span>Schedule entries</span>
+          <span class="helper-text">These rows map to <code>Schedule</code> objects.</span>
+        </div>
+        <div class="table-scroll">
+          <table class="billing-table">
+            <thead>
+            <tr>
+              <th>Day</th>
+              <th>Start</th>
+              <th>End</th>
+              <th>Room</th>
+              <th>Building</th>
+              <th>Actions</th>
+            </tr>
+            </thead>
+            <tbody id="scheduleTableBody">
+            <!-- JS will fill schedule rows here -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- COURSE LIST TABLE (CourseListResponse) -->
+    <section>
+      <div class="billing-header">
+        <div>All courses</div>
+        <div class="billing-summary">
+          <span class="summary-chip">
+            Total: <strong id="courseTotalCount"></strong>
+          </span>
+        </div>
+      </div>
+
+      <div class="table-wrapper">
+        <div class="table-header">
+          <span>Courses overview</span>
+          <span class="helper-text">Data comes from /api/courses/list.</span>
+        </div>
+        <div class="table-scroll">
+          <table class="billing-table">
+            <thead>
+            <tr>
+              <th>Code</th>
+              <th>Name</th>
+              <th>Credits</th>
+              <th>Semester</th>
+              <th>Professor</th>
+              <th>Capacity</th>
+              <th>Enrolled</th>
+            </tr>
+            </thead>
+            <tbody id="coursesTableBody">
+            <!-- JS will fill rows from backend -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<!-- SCRIPT: all the logic to load + save courses -->
+
+</body>
+</html>

@@ -1,0 +1,45 @@
+PLACEHOLDER FILE
+
+This file should be replaced with the actual demonstration video:
+demo-video.mp4
+
+The video should demonstrate:
+1. Project structure overview (2 min)
+2. Docker Compose startup (3 min)
+3. Service health checks (2 min)
+4. Authentication flow (3 min)
+   - User registration
+   - Login and JWT token generation
+5. Course management (4 min)
+   - Create course (SOAP)
+   - Get course details
+   - Update course
+6. Student operations (3 min)
+   - Create student
+   - Get student list
+7. Grade management (3 min)
+   - Add grades
+   - Calculate GPA
+8. Billing operations (3 min)
+   - Create invoice
+   - Process payment
+9. API Gateway routing (2 min)
+   - Route different requests
+   - Error handling
+10. Monitoring and logs (2 min)
+11. System shutdown (1 min)
+
+Technical requirements:
+- Format: MP4
+- Resolution: 1920x1080 (Full HD)
+- Duration: 25-30 minutes
+- Include voice narration
+- Show terminal commands and UI
+- Demonstrate both success and error scenarios
+
+Recording tips:
+- Use screen recording software (OBS Studio, Camtasia)
+- Clear audio narration
+- Highlight important actions
+- Include timestamps for easy navigation
+- Test playback on different devices

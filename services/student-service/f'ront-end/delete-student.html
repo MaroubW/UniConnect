@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Delete Student • Admin Console</title>
+
+    <!-- Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- External CSS -->
+    <link rel="stylesheet" href="style/style_delete.css">
+</head>
+<body>
+<div class="shell">
+    <!-- LEFT SIDE -->
+    <section class="left">
+        <div class="left-header">
+            <div class="brand">
+                <div class="brand-logo">ST</div>
+                <div>
+                    <h1>Student Console</h1>
+                    <div class="brand-sub">Destructive actions</div>
+                </div>
+            </div>
+            <div class="tag">Delete</div>
+        </div>
+
+        <div class="title-block">
+            <h2>Delete a student</h2>
+            <p>Look up the student record, verify identity, then confirm deletion. This action cannot be undone.</p>
+        </div>
+
+        <div class="warn-box">
+            <strong>Warning:</strong> Removing a student permanently erases their record
+            (and any related data that your backend deletes in cascade).
+        </div>
+    </section>
+
+    <!-- RIGHT SIDE -->
+    <section class="right">
+        <div class="right-header">
+            <h3>Find student by ID</h3>
+            <p>Use the database <code>_id</code> from your list page or API response.</p>
+        </div>
+
+        <div class="load-row">
+            <input id="studentIdInput" type="text"
+                   placeholder="Enter student ID (e.g. 6924c011b9de5f90488935de)">
+            <button class="btn-load" id="loadBtn">
+                <span>🔍</span> Load student
+            </button>
+        </div>
+
+        <!-- STUDENT CARD -->
+        <article class="card" id="studentCard">
+            <div class="card-header">
+                <div class="card-main">
+                    <div class="avatar" id="avatar">ST</div>
+                    <div>
+                        <div class="card-name" id="cardName">—</div>
+                        <div class="card-email" id="cardEmail">—</div>
+                    </div>
+                </div>
+                <span class="status-pill" id="cardStatus">Unknown</span>
+            </div>
+
+            <div class="card-body">
+                <div><span class="label">Student #:</span> <span id="cardNumber">—</span></div>
+                <div><span class="label">Department:</span> <span id="cardDept">—</span></div>
+                <div><span class="label">Level:</span> <span id="cardLevel">—</span></div>
+                <div><span class="label">Birth date:</span> <span id="cardDob">—</span></div>
+            </div>
+
+            <div class="card-footer">
+                <span id="cardId">ID: —</span>
+                <span id="cardCreated">Created: —</span>
+            </div>
+
+            <div class="actions-row">
+                <div class="confirm-text">
+                    Type <strong>DELETE</strong> to enable the delete button:
+                    <input id="confirmInput" type="text" class="confirm-input">
+                </div>
+                <button class="danger" id="deleteBtn" disabled>
+                    <span>🗑️</span> Delete student
+                </button>
+            </div>
+
+            <div class="status-bar" id="statusBar">
+                <div class="status-inner" id="statusInner"></div>
+            </div>
+        </article>
+    </section>
+</div>
+
+<!-- IN-PAGE MODAL POPUP -->
+<div class="modal-backdrop" id="deleteModal">
+    <div class="modal">
+        <h4>Confirm deletion</h4>
+        <p>
+            Are you sure you want to delete
+            <span class="modal-student-name" id="modalStudentName">this student</span>?
+            <br>
+            This action <strong>cannot</strong> be undone.
+        </p>
+        <div class="modal-actions">
+            <button type="button" class="btn-secondary" id="modalCancelBtn">
+                Cancel
+            </button>
+            <button type="button" class="danger" id="modalConfirmBtn">
+                <span>🗑️</span> Yes, delete
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- External JS -->
+<script src="controller/script_delete.js"></script>
+</body>
+</html>

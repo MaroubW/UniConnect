@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Course Service - SOAP Web Service</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            border-bottom: 3px solid #4CAF50;
+            padding-bottom: 10px;
+        }
+        h2 {
+            color: #4CAF50;
+            margin-top: 30px;
+        }
+        .endpoint {
+            background-color: #f9f9f9;
+            padding: 15px;
+            border-left: 4px solid #4CAF50;
+            margin: 10px 0;
+        }
+        .endpoint code {
+            background-color: #e8e8e8;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+        }
+        .operations {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        .operation {
+            background-color: #f0f8ff;
+            padding: 15px;
+            border-radius: 5px;
+            border: 1px solid #4CAF50;
+        }
+        .operation h3 {
+            margin-top: 0;
+            color: #2196F3;
+            font-size: 16px;
+        }
+        .operation p {
+            margin: 5px 0;
+            font-size: 14px;
+            color: #666;
+        }
+        .status {
+            display: inline-block;
+            padding: 5px 10px;
+            background-color: #4CAF50;
+            color: white;
+            border-radius: 3px;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+        a {
+            color: #2196F3;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎓 Course Service - SOAP Web Service</h1>
+        <p><span class="status">✓ Service Active</span></p>
+        
+        <h2>Service Information</h2>
+        <p>This is a SOAP web service for managing university courses and schedules.</p>
+        
+        <div class="endpoint">
+            <strong>WSDL URL:</strong><br>
+            <code><a href="/course-service/services/course?wsdl" target="_blank">
+                http://localhost:8080/course-service/services/course?wsdl
+            </a></code>
+        </div>
+        
+        <div class="endpoint">
+            <strong>Service Endpoint:</strong><br>
+            <code>http://localhost:8080/course-service/services/course</code>
+        </div>
+        
+        <div class="endpoint">
+            <strong>Namespace:</strong><br>
+            <code>http://service.course.soa.university.com/</code>
+        </div>
+
+        <h2>Available Operations</h2>
+        
+        <div class="operations">
+            <div class="operation">
+                <h3>createCourse</h3>
+                <p>Create a new course in the system</p>
+            </div>
+            
+            <div class="operation">
+                <h3>getCourseById</h3>
+                <p>Retrieve a course by its ID</p>
+            </div>
+            
+            <div class="operation">
+                <h3>getCourseByCode</h3>
+                <p>Retrieve a course by its code</p>
+            </div>
+            
+            <div class="operation">
+                <h3>getAllCourses</h3>
+                <p>Get all courses in the system</p>
+            </div>
+            
+            <div class="operation">
+                <h3>getCoursesBySemester</h3>
+                <p>Get courses for a specific semester</p>
+            </div>
+            
+            <div class="operation">
+                <h3>getCoursesByProfessor</h3>
+                <p>Get courses taught by a professor</p>
+            </div>
+            
+            <div class="operation">
+                <h3>updateCourse</h3>
+                <p>Update an existing course</p>
+            </div>
+            
+            <div class="operation">
+                <h3>deleteCourse</h3>
+                <p>Delete a course from the system</p>
+            </div>
+            
+            <div class="operation">
+                <h3>addSchedule</h3>
+                <p>Add a schedule to a course</p>
+            </div>
+            
+            <div class="operation">
+                <h3>updateSchedule</h3>
+                <p>Update an existing schedule</p>
+            </div>
+            
+            <div class="operation">
+                <h3>deleteSchedule</h3>
+                <p>Delete a schedule</p>
+            </div>
+            
+            <div class="operation">
+                <h3>getCourseSchedules</h3>
+                <p>Get all schedules for a course</p>
+            </div>
+            
+            <div class="operation">
+                <h3>searchCourses</h3>
+                <p>Search courses by name or code</p>
+            </div>
+            
+            <div class="operation">
+                <h3>getAvailableCourses</h3>
+                <p>Get courses with available capacity</p>
+            </div>
+        </div>
+
+        <h2>Testing the Service</h2>
+        <p>You can test this SOAP service using tools like:</p>
+        <ul>
+            <li><strong>SoapUI</strong> - Import the WSDL and test operations</li>
+            <li><strong>Postman</strong> - Create SOAP requests</li>
+            <li><strong>curl</strong> - Send SOAP XML requests via command line</li>
+            <li><strong>Java Client</strong> - Generate client code using wsimport</li>
+        </ul>
+
+        <h2>Sample SOAP Request</h2>
+        <div class="endpoint">
+            <pre style="overflow-x: auto;">
+&lt;soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" 
+                  xmlns:ser="http://service.course.soa.university.com/"&gt;
+   &lt;soapenv:Header/&gt;
+   &lt;soapenv:Body&gt;
+      &lt;ser:getAllCourses/&gt;
+   &lt;/soapenv:Body&gt;
+&lt;/soapenv:Envelope&gt;
+            </pre>
+        </div>
+
+        <h2>Documentation</h2>
+        <p>For detailed API documentation, please refer to the WSDL file or the technical documentation.</p>
+        
+        <hr style="margin: 30px 0; border: none; border-top: 1px solid #ddd;">
+        <p style="text-align: center; color: #666; font-size: 14px;">
+            Course Service v1.0.0 | SOA University Project
+        </p>
+    </div>
+</body>
+</html>

@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Grade Service API Documentation</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        :root {
+            color-scheme: light dark;
+        }
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+            background: #0f172a;
+            color: #e5e7eb;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 2rem 1rem 4rem;
+        }
+        header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        h1 {
+            margin-bottom: 0.3rem;
+        }
+        h2, h3, h4 {
+            margin-top: 1.8rem;
+            color: #38bdf8;
+        }
+        code {
+            background: rgba(15, 23, 42, 0.9);
+            padding: 0.15rem 0.3rem;
+            border-radius: 4px;
+            font-size: 0.95em;
+        }
+        pre {
+            background: #020617;
+            padding: 1rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            border: 1px solid #1f2937;
+        }
+        .card {
+            border-radius: 10px;
+            border: 1px solid #1f2937;
+            padding: 1.2rem 1.4rem;
+            margin-bottom: 1.2rem;
+            background: radial-gradient(circle at top, rgba(56,189,248,0.08), rgba(15,23,42,0.95));
+        }
+        .endpoint-method {
+            display: inline-block;
+            font-weight: bold;
+            padding: 0.2rem 0.5rem;
+            border-radius: 999px;
+            font-size: 0.8rem;
+            margin-right: 0.5rem;
+        }
+        .GET { background: #0f766e; }
+        .POST { background: #1d4ed8; }
+        .PUT { background: #7c2d12; }
+        .DELETE { background: #b91c1c; }
+        .endpoint-path {
+            font-family: "Fira Code", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+            font-size: 0.95rem;
+        }
+        .tag {
+            display: inline-block;
+            border-radius: 999px;
+            border: 1px solid #4b5563;
+            padding: 0.15rem 0.5rem;
+            font-size: 0.75rem;
+            margin-right: 0.3rem;
+            opacity: 0.9;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+        th, td {
+            border: 1px solid #1f2937;
+            padding: 0.4rem 0.6rem;
+            font-size: 0.9rem;
+        }
+        th {
+            background: rgba(15, 23, 42, 0.9);
+            text-align: left;
+        }
+        .small {
+            font-size: 0.85rem;
+            opacity: 0.8;
+        }
+        .pill {
+            display: inline-block;
+            padding: 0.1rem 0.4rem;
+            border-radius: 999px;
+            border: 1px solid #4b5563;
+            font-size: 0.75rem;
+        }
+        a {
+            color: #38bdf8;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        hr {
+            border: none;
+            border-top: 1px solid #1f2937;
+            margin: 2rem 0;
+        }
+        .badge-required {
+            color: #f97316;
+            font-size: 0.75rem;
+            font-weight: bold;
+        }
+        .json-block {
+            font-family: "Fira Code", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+            font-size: 0.9rem;
+        }
+        @media (max-width: 640px) {
+            .container {
+                padding: 1.5rem 1rem 3rem;
+            }
+            table, thead, tbody, th, td, tr {
+                font-size: 0.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <header>
+        <h1>Grade Service API</h1>
+        <p class="small">FastAPI service for managing student grades (MongoDB + Motor)</p>
+    </header>
+
+    <section id="overview" class="card">
+        <h2>Overview</h2>
+        <p>
+            The <strong>Grade Service</strong> is a REST API built with <code>FastAPI</code> and
+            <code>Motor</code> (async MongoDB driver) to manage student grades and calculate their average.
+        </p>
+        <ul>
+            <li>Create, read, update, and delete grades</li>
+            <li>Store grades in MongoDB</li>
+            <li>Compute student average based on all their grades</li>
+        </ul>
+    </section>
+
+    <section id="stack" class="card">
+        <h2>Technology Stack</h2>
+        <ul>
+            <li><strong>Framework:</strong> FastAPI</li>
+            <li><strong>Web server:</strong> Uvicorn</li>
+            <li><strong>Database:</strong> MongoDB</li>
+            <li><strong>Driver:</strong> Motor (AsyncIOMotorDatabase)</li>
+            <li><strong>Language:</strong> Python 3.9+</li>
+        </ul>
+    </section>
+
+    <section id="setup" class="card">
+        <h2>Installation &amp; Setup</h2>
+        <h3>1. Install dependencies</h3>
+        <pre><code>pip install fastapi uvicorn "motor" pydantic</code></pre>
+
+        <h3>2. MongoDB configuration</h3>
+        <p>Example <code>database.py</code>:</p>
+        <pre><code class="json-block">from motor.motor_asyncio import AsyncIOMotorClient, AsyncIOMotorDatabase
+
+MONGO_URL = "mongodb://localhost:27017"
+DB_NAME = "grades_db"
+
+client = AsyncIOMotorClient(MONGO_URL)
+
+def get_database() -&gt; AsyncIOMotorDatabase:
+    return client[DB_NAME]</code></pre>
+
+        <h3>3. Start the server</h3>
+        <p>From the project root (where <code>main.py</code> is located):</p>
+        <pre><code>python -m uvicorn main:app --reload</code></pre>
+
+        <h3>4. API documentation (Swagger)</h3>
+        <ul>
+            <li><strong>Swagger UI:</strong> <code>http://127.0.0.1:8000/docs</code></li>
+            <li><strong>ReDoc:</strong> <code>http://127.0.0.1:8000/redoc</code></li>
+        </ul>
+    </section>
+
+    <section id="models" class="card">
+        <h2>Data Models &amp; Schemas</h2>
+
+        <h3>GradeCreate (request body)</h3>
+        <table>
+            <thead>
+            <tr>
+                <th>Field</th>
+                <th>Type</th>
+                <th>Required</th>
+                <th>Description</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td><code>student_id</code></td>
+                <td><code>int</code></td>
+                <td>Yes</td>
+                <td>Identifier of the student</td>
+            </tr>
+            <tr>
+                <td><code>subject</code></td>
+                <td><code>str</code></td>
+                <td>Yes</td>
+                <td>Subject name (e.g. <em>"Math"</em>)</td>
+            </tr>
+            <tr>
+                <td><code>grade_value</code></td>
+                <td><code>float</code></td>
+                <td>Yes</td>
+                <td>Numeric grade value</td>
+            </tr>
+            </tbody>
+        </table>
+
+        <h3>Grade (response model)</h3>
+        <table>
+            <thead>
+            <tr>
+                <th>Field</th>
+                <th>Type</th>
+                <th>Description</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td><code>id</code></td>
+                <td><code>str</code></td>
+                <td>MongoDB ObjectId as string</td>
+            </tr>
+            <tr>
+                <td><code>student_id</code></td>
+                <td><code>int</code></td>
+                <td>Identifier of the student</td>
+            </tr>
+            <tr>
+                <td><code>subject</code></td>
+                <td><code>str</code></td>
+                <td>Subject name</td>
+            </tr>
+            <tr>
+                <td><code>grade_value</code></td>
+                <td><code>float</code></td>
+                <td>Grade value</td>
+            </tr>
+            </tbody>
+        </table>
+
+        <h3>AverageResponse</h3>
+        <table>
+            <thead>
+            <tr>
+                <th>Field</th>
+                <th>Type</th>
+                <th>Description</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td><code>student_id</code></td>
+                <td><code>int</code></td>
+                <td>Identifier of the student</td>
+            </tr>
+            <tr>
+                <td><code>average</code></td>
+                <td><code>float</code></td>
+                <td>Average grade value for the student</td>
+            </tr>
+            </tbody>
+        </table>
+    </section>
+
+    <section id="endpoints" class="card">
+        <h2>Endpoints</h2>
+
+        <!-- GET /grades/ -->
+        <div class="endpoint">
+            <h3>
+                <span class="endpoint-method GET">GET</span>
+                <span class="endpoint-path">/grades/</span>
+            </h3>
+            <p>Retrieve a paginated list of all grades.</p>
+            <span class="tag">List Grades</span>
+            <h4>Query Parameters</h4>
+            <table>
+                <thead>
+                <tr>
+                    <th>Name</th><th>Type</th><th>Default</th><th>Description</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td><code>skip</code></td>
+                    <td><code>int</code></td>
+                    <td><code>0</code></td>
+                    <td>Number of documents to skip (for pagination)</td>
+                </tr>
+                <tr>
+                    <td><code>limit</code></td>
+                    <td><code>int</code></td>
+                    <td><code>100</code></td>
+                    <td>Maximum number of documents to return</td>
+                </tr>
+                </tbody>
+            </table>
+
+            <h4>Response</h4>
+            <p><code>200 OK</code> — JSON array of <code>Grade</code> objects.</p>
+            <pre><code class="json-block">[
+  {
+    "id": "665f2a3c5b8b8e2f9f3acd12",
+    "student_id": 1,
+    "subject": "Math",
+    "grade_value": 18.0
+  }
+]</code></pre>
+        </div>
+
+        <hr>
+
+        <!-- GET /grades/{grade_id} -->
+        <div class="endpoint">
+            <h3>
+                <span class="endpoint-method GET">GET</span>
+                <span class="endpoint-path">/grades/{grade_id}</span>
+            </h3>
+            <p>Retrieve a single grade by its ID.</p>
+            <span class="tag">Get Grade</span>
+            <h4>Path Parameters</h4>
+            <table>
+                <thead>
+                <tr><th>Name</th><th>Type</th><th>Description</th></tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td><code>grade_id</code></td>
+                    <td><code>str</code></td>
+                    <td>MongoDB ObjectId as string</td>
+                </tr>
+                </tbody>
+            </table>
+
+            <h4>Responses</h4>
+            <ul>
+                <li><code>200 OK</code> — Returns the <code>Grade</code> object.</li>
+                <li><code>404 Not Found</code> — If no grade exists with this ID.</li>
+            </ul>
+        </div>
+
+        <hr>
+
+        <!-- POST /grades/ -->
+        <div class="endpoint">
+            <h3>
+                <span class="endpoint-method POST">POST</span>
+                <span class="endpoint-path">/grades/</span>
+            </h3>
+            <p>Create a new grade.</p>
+            <span class="tag">Create Grade</span>
+
+            <h4>Request Body</h4>
+            <p class="small"><span class="badge-required">Content-Type: application/json</span></p>
+            <pre><code class="json-block">{
+  "student_id": 1,
+  "subject": "Math",
+  "grade_value": 18.0
+}</code></pre>
+
+            <h4>Response</h4>
+            <ul>
+                <li><code>200 OK</code> — Returns the created <code>Grade</code> with generated <code>id</code>.</li>
+            </ul>
+        </div>
+
+        <hr>
+
+        <!-- PUT /grades/{grade_id} -->
+        <div class="endpoint">
+            <h3>
+                <span class="endpoint-method PUT">PUT</span>
+                <span class="endpoint-path">/grades/{grade_id}</span>
+            </h3>
+            <p>Update an existing grade completely.</p>
+            <span class="tag">Update Grade</span>
+
+            <h4>Path Parameters</h4>
+            <table>
+                <thead>
+                <tr><th>Name</th><th>Type</th><th>Description</th></tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td><code>grade_id</code></td>
+                    <td><code>str</code></td>
+                    <td>MongoDB ObjectId of the grade</td>
+                </tr>
+                </tbody>
+            </table>
+
+            <h4>Request Body</h4>
+            <pre><code class="json-block">{
+  "student_id": 1,
+  "subject": "Math",
+  "grade_value": 19.5
+}</code></pre>
+
+            <h4>Responses</h4>
+            <ul>
+                <li><code>200 OK</code> — Returns the updated <code>Grade</code>.</li>
+                <li><code>404 Not Found</code> — If grade does not exist.</li>
+            </ul>
+        </div>
+
+        <hr>
+
+        <!-- DELETE /grades/{grade_id} -->
+        <div class="endpoint">
+            <h3>
+                <span class="endpoint-method DELETE">DELETE</span>
+                <span class="endpoint-path">/grades/{grade_id}</span>
+            </h3>
+            <p>Delete a grade by ID.</p>
+            <span class="tag">Delete Grade</span>
+
+            <h4>Responses</h4>
+            <ul>
+                <li><code>200 OK</code> — <code>{"message": "Grade deleted"}</code></li>
+                <li><code>404 Not Found</code> — If grade does not exist.</li>
+            </ul>
+        </div>
+
+        <hr>
+
+        <!-- GET /grades/student/{student_id}/average -->
+        <div class="endpoint">
+            <h3>
+                <span class="endpoint-method GET">GET</span>
+                <span class="endpoint-path">/grades/student/{student_id}/average</span>
+            </h3>
+            <p>Compute the average grade for a specific student.</p>
+            <span class="tag">Student Average</span>
+
+            <h4>Path Parameters</h4>
+            <table>
+                <thead>
+                <tr><th>Name</th><th>Type</th><th>Description</th></tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td><code>student_id</code></td>
+                    <td><code>int</code></td>
+                    <td>Identifier of the student</td>
+                </tr>
+                </tbody>
+            </table>
+
+            <h4>Responses</h4>
+            <ul>
+                <li><code>200 OK</code> — Returns <code>AverageResponse</code>:</li>
+            </ul>
+            <pre><code class="json-block">{
+  "student_id": 1,
+  "average": 17.25
+}</code></pre>
+            <ul>
+                <li><code>404 Not Found</code> — If no grades are found for this student.</li>
+            </ul>
+        </div>
+    </section>
+
+    <section id="examples" class="card">
+        <h2>Example cURL Requests</h2>
+
+        <h3>Create a grade</h3>
+        <pre><code>curl -X POST "http://127.0.0.1:8000/grades/" ^
+  -H "Content-Type: application/json" ^
+  -d "{ \"student_id\": 1, \"subject\": \"Math\", \"grade_value\": 18 }"</code></pre>
+
+        <h3>Get all grades</h3>
+        <pre><code>curl "http://127.0.0.1:8000/grades/?skip=0&amp;limit=10"</code></pre>
+
+        <h3>Get a student's average</h3>
+        <pre><code>curl "http://127.0.0.1:8000/grades/student/1/average"</code></pre>
+    </section>
+
+    <footer class="small" style="text-align:center; margin-top:2rem; opacity:0.7;">
+        Grade Service API &mdash; FastAPI &amp; MongoDB
+    </footer>
+</div>
+</body>
+</html>

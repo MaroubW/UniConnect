@@ -1,0 +1,13 @@
+version: '3.8'
+
+services:
+  grade-service:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfiles/grade-service.Dockerfile
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./services/grade-service/grades.db:/app/grades.db
+    environment:
+      - DATABASE_URL=sqlite:///./grades.db

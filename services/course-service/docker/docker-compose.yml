@@ -1,0 +1,225 @@
+version: '3.8'
+
+services:
+  # Databases
+  auth-db:
+    image: postgres:14-alpine
+    container_name: auth-db
+    environment:
+      POSTGRES_DB: authdb
+      POSTGRES_USER: ${POSTGRES_USER:-authuser}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-authpass}
+    ports:
+      - "5432:5432"
+    volumes:
+      - auth_db_data:/var/lib/postgresql/data
+    networks:
+      - soa-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-authuser} -d authdb"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  student-db:
+    image: mongo:5.0
+    container_name: student-db
+    environment:
+      MONGO_INITDB_DATABASE: studentdb
+    ports:
+      - "27017:27017"
+    volumes:
+      - student_db_data:/data/db
+    networks:
+      - soa-network
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  grade-db:
+    image: postgres:14-alpine
+    container_name: grade-db
+    environment:
+      POSTGRES_DB: gradedb
+      POSTGRES_USER: ${GRADE_DB_USER:-gradeuser}
+      POSTGRES_PASSWORD: ${GRADE_DB_PASSWORD:-gradepass}
+    ports:
+      - "5433:5432"
+    volumes:
+      - grade_db_data:/var/lib/postgresql/data
+    networks:
+      - soa-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${GRADE_DB_USER:-gradeuser} -d gradedb"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  billing-db:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: billing-db
+    environment:
+      ACCEPT_EULA: Y
+      SA_PASSWORD: ${BILLING_DB_PASSWORD:-Billing123!}
+    ports:
+      - "1433:1433"
+    volumes:
+      - billing_db_data:/var/opt/mssql
+    networks:
+      - soa-network
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P ${BILLING_DB_PASSWORD:-Billing123!} -Q 'SELECT 1'"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Eureka Server (for service discovery)
+  eureka-server:
+    image: springcloud/eureka
+    container_name: eureka-server
+    ports:
+      - "8761:8761"
+    networks:
+      - soa-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8761"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Microservices
+  auth-service:
+    build:
+      context: ../services/auth-service
+      dockerfile: Dockerfile
+    container_name: auth-service
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-authuser}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-authpass}
+      JWT_SECRET: ${JWT_SECRET:-my-secret-key}
+    ports:
+      - "8081:8081"
+    depends_on:
+      auth-db:
+        condition: service_healthy
+    networks:
+      - soa-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8081/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  student-service:
+    build:
+      context: ../services/student-service
+      dockerfile: Dockerfile
+    container_name: student-service
+    environment:
+      MONGODB_URI: mongodb://student-db:27017/studentdb
+      PORT: 8083
+    ports:
+      - "8083:8083"
+    depends_on:
+      student-db:
+        condition: service_healthy
+    networks:
+      - soa-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8083/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  course-service:
+    build:
+      context: ../services/course-service
+      dockerfile: Dockerfile
+    container_name: course-service
+    ports:
+      - "8082:8080"
+    networks:
+      - soa-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/course-service/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  grade-service:
+    build:
+      context: ../services/grade-service
+      dockerfile: Dockerfile
+    container_name: grade-service
+    environment:
+      DATABASE_URL: postgresql://gradeuser:gradepass@grade-db:5432/gradedb
+      PORT: 8084
+    ports:
+      - "8084:8084"
+    depends_on:
+      grade-db:
+        condition: service_healthy
+    networks:
+      - soa-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8084/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  billing-service:
+    build:
+      context: ../services/billing-service
+      dockerfile: Dockerfile
+    container_name: billing-service
+    environment:
+      ConnectionStrings__DefaultConnection: Server=billing-db,1433;Database=billingdb;User Id=sa;Password=${BILLING_DB_PASSWORD:-Billing123!};TrustServerCertificate=True;
+      ASPNETCORE_URLS: http://+:8085
+    ports:
+      - "8085:8085"
+    depends_on:
+      billing-db:
+        condition: service_healthy
+    networks:
+      - soa-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8085/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  api-gateway:
+    build:
+      context: ../services/api-gateway
+      dockerfile: Dockerfile
+    container_name: api-gateway
+    environment:
+      JWT_SECRET: ${JWT_SECRET:-my-secret-key}
+    ports:
+      - "8080:8080"
+    depends_on:
+      - auth-service
+      - student-service
+      - course-service
+      - grade-service
+      - billing-service
+      - eureka-server
+    networks:
+      - soa-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+volumes:
+  auth_db_data:
+  student_db_data:
+  grade_db_data:
+  billing_db_data:
+
+networks:
+  soa-network:
+    driver: bridge

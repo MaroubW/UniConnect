@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Grade Service – SOA Portal</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <style>
+    :root {
+      font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      color-scheme: light;
+      --bg: #020617;
+      --accent: #4f46e5;
+      --accent-soft: #eef2ff;
+      --accent-green: #22c55e;
+      --border: #e5e7eb;
+      --text: #0f172a;
+      --text-muted: #6b7280;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      align-items: stretch;
+      justify-content: center;
+      padding: 20px;
+      background:
+        radial-gradient(circle at top left, rgba(79, 70, 229, 0.4), transparent 55%),
+        radial-gradient(circle at bottom right, rgba(34, 197, 94, 0.4), transparent 55%),
+        var(--bg);
+      color: var(--text);
+    }
+
+    a { color: inherit; text-decoration: none; }
+
+    .shell {
+      width: 100%;
+      max-width: 1080px;
+      border-radius: 24px;
+      background: radial-gradient(circle at top left, rgba(255, 255, 255, 0.96), #f3f4f6);
+      box-shadow: 0 26px 70px rgba(15, 23, 42, 0.7), 0 0 0 1px rgba(148, 163, 184, 0.25);
+      overflow: hidden;
+      display: grid;
+      grid-template-columns: minmax(0, 1.1fr) minmax(0, 1.3fr);
+    }
+
+    .left {
+      position: relative;
+      padding: 26px 26px 20px;
+      background: radial-gradient(circle at top left, #4f46e5, #1d4ed8);
+      color: white;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    .left::before, .left::after {
+      content: "";
+      position: absolute;
+      border-radius: 999px;
+      filter: blur(28px);
+      opacity: 0.7;
+      pointer-events: none;
+    }
+
+    .left::before {
+      width: 150px; height: 150px;
+      background: rgba(56, 189, 248, 0.8);
+      top: -40px; right: -40px;
+    }
+
+    .left::after {
+      width: 110px; height: 110px;
+      background: rgba(22, 163, 74, 0.7);
+      bottom: -40px; left: -30px;
+    }
+
+    .left-header, .title-block, .preview-card { position: relative; z-index: 1; }
+
+    .left-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .brand { display: flex; align-items: center; gap: 10px; }
+
+    .brand-logo {
+      width: 32px; height: 32px;
+      border-radius: 12px;
+      background: conic-gradient(from 200deg, #22c55e, #a855f7, #f97316, #22c55e);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: white;
+      box-shadow: 0 10px 22px rgba(15, 23, 42, 0.6);
+    }
+
+    .brand h1 { margin: 0; font-size: 1rem; font-weight: 600; }
+    .brand-sub { font-size: 0.72rem; opacity: 0.9; }
+
+    .tag {
+      font-size: 0.72rem;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.3);
+      border: 1px solid rgba(148, 163, 184, 0.7);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .title-block h2 { margin: 4px 0 0; font-size: 1.5rem; font-weight: 700; }
+    .title-block p { margin: 8px 0 0; font-size: 0.9rem; opacity: 0.92; }
+
+    .chips-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+
+    .chip {
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      background: rgba(15, 23, 42, 0.25);
+      border: 1px solid rgba(148, 163, 184, 0.7);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .chip-dot {
+      width: 7px; height: 7px;
+      border-radius: 999px;
+      background: #22c55e;
+      box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.3);
+    }
+
+    .chip-pill {
+      padding: 2px 7px;
+      border-radius: 999px;
+      font-size: 0.7rem;
+      background: rgba(15, 23, 42, 0.55);
+    }
+
+    .preview-card {
+      margin-top: auto;
+      border-radius: 18px;
+      padding: 14px 14px 12px;
+      background:
+        radial-gradient(circle at top left, rgba(148, 163, 184, 0.4), transparent 55%),
+        rgba(15, 23, 42, 0.78);
+      border: 1px solid rgba(148, 163, 184, 0.35);
+      box-shadow: 0 10px 22px rgba(15, 23, 42, 0.6);
+    }
+
+    .preview-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 10px;
+    }
+
+    .preview-main { display: flex; gap: 10px; }
+
+    .avatar {
+      width: 36px; height: 36px;
+      border-radius: 12px;
+      background: radial-gradient(circle at top left, #22c55e, #0ea5e9);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: white;
+    }
+
+    .preview-text { display: flex; flex-direction: column; gap: 2px; }
+    .preview-name { font-size: 0.98rem; font-weight: 600; }
+    .preview-email { font-size: 0.78rem; opacity: 0.9; }
+
+    .preview-meta {
+      margin-top: 6px;
+      font-size: 0.75rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .badge-soft {
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.4);
+      border: 1px solid rgba(148, 163, 184, 0.6);
+    }
+
+    .status-pill {
+      padding: 2px 10px;
+      border-radius: 999px;
+      font-size: 0.72rem;
+      font-weight: 500;
+      background: rgba(22, 163, 74, 0.15);
+      color: #bbf7d0;
+      border: 1px solid rgba(34, 197, 94, 0.7);
+    }
+
+    .preview-footer {
+      margin-top: 10px;
+      padding-top: 8px;
+      border-top: 1px dashed rgba(148, 163, 184, 0.6);
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.72rem;
+      color: #cbd5f5;
+      opacity: 0.85;
+    }
+
+    .right {
+      padding: 24px 24px 22px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      background: #fefefe;
+    }
+
+    .right-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 10px;
+    }
+
+    .right-header h2 { margin: 0; font-size: 1.25rem; font-weight: 600; color: var(--text); }
+    .right-header p { margin: 4px 0 0; font-size: 0.86rem; color: var(--text-muted); }
+
+    .badge-small {
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: #e5e7eb;
+      color: #4b5563;
+      font-size: 0.74rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .badge-dot { width: 8px; height: 8px; border-radius: 999px; background: var(--accent-green); }
+
+    .nav-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.86rem;
+      color: var(--text-muted);
+    }
+
+    .nav-links { display: inline-flex; gap: 8px; flex-wrap: wrap; }
+
+    .nav-link {
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: #eef2ff;
+      color: #312e81;
+      font-size: 0.8rem;
+      border: 1px solid #c7d2fe;
+    }
+
+    .nav-link.outline { background: #ffffff; color: #4b5563; border-color: #d1d5db; }
+
+    form {
+      margin-top: 8px;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px 16px;
+    }
+
+    .field { display: flex; flex-direction: column; gap: 4px; }
+    .field.full { grid-column: 1 / -1; }
+
+    .field label { font-size: 0.86rem; font-weight: 500; color: #374151; }
+    .field small { font-size: 0.74rem; color: #9ca3af; }
+
+    /* ✅ also style the datalist-backed text inputs */
+    .field input {
+      padding: 8px 10px;
+      border-radius: 10px;
+      border: 1px solid #d1d5db;
+      font-size: 0.86rem;
+      outline: none;
+      background: #f9fafb;
+      transition: border-color 0.14s ease, box-shadow 0.14s ease,
+                  background 0.14s ease, transform 0.08s ease;
+    }
+
+    .field input:focus {
+      border-color: var(--accent);
+      background: #ffffff;
+      box-shadow: 0 0 0 1px rgba(79, 70, 229, 0.24);
+      transform: translateY(-1px);
+    }
+
+    .actions {
+      grid-column: 1 / -1;
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 6px;
+    }
+
+    button {
+      border-radius: 999px;
+      border: none;
+      padding: 9px 16px;
+      font-size: 0.88rem;
+      font-weight: 500;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: transform 0.1s ease, box-shadow 0.1s ease,
+                  background 0.1s ease, opacity 0.1s ease;
+    }
+
+    .btn-secondary { background: #ffffff; color: #4b5563; border: 1px solid #d1d5db; }
+    .btn-primary { background: linear-gradient(135deg, #4f46e5, #6366f1); color: white; box-shadow: 0 1px 4px rgba(79, 70, 229, 0.5); }
+    .btn-danger { background: #ef4444; color: white; }
+
+    button:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 4px 8px rgba(15, 23, 42, 0.2); }
+    button:disabled { opacity: 0.7; cursor: default; transform: none; box-shadow: none; }
+
+    .average-box {
+      margin-top: 6px;
+      font-size: 0.86rem;
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .average-result { font-weight: 600; color: #15803d; }
+
+    .table-wrapper {
+      margin-top: 12px;
+      border-radius: 16px;
+      background: #ffffff;
+      border: 1px solid var(--border);
+      box-shadow: 0 8px 18px rgba(15, 23, 42, 0.06), 0 0 0 1px rgba(148, 163, 184, 0.08);
+      overflow: hidden;
+    }
+
+    .table-header {
+      padding: 10px 12px;
+      border-bottom: 1px solid #e5e7eb;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.84rem;
+    }
+
+    .table-scroll { max-height: 260px; overflow: auto; }
+
+    table { width: 100%; border-collapse: collapse; font-size: 0.84rem; }
+    thead { background: #f9fafb; }
+
+    th, td {
+      padding: 8px 10px;
+      text-align: left;
+      border-bottom: 1px solid #e5e7eb;
+    }
+
+    th { font-size: 0.78rem; font-weight: 500; color: var(--text-muted); }
+    tbody tr:hover { background: #eef2ff; }
+
+    .helper-text { font-size: 0.78rem; color: var(--text-muted); margin-top: 4px; }
+
+    @media (max-width: 860px) {
+      .shell { grid-template-columns: minmax(0, 1fr); max-width: 680px; }
+      .preview-card { margin-top: 12px; }
+    }
+
+    @media (max-width: 520px) {
+      body { padding: 0; }
+      .shell { border-radius: 0; box-shadow: none; }
+      .right { padding: 18px 16px 20px; }
+      .left { padding: 18px 16px 16px; }
+      form { grid-template-columns: minmax(0, 1fr); }
+    }
+  </style>
+</head>
+<body>
+
+<div class="shell">
+  <!-- LEFT PANEL -->
+  <aside class="left">
+    <div class="left-header">
+      <div class="brand">
+        <div class="brand-logo">G</div>
+        <div>
+          <h1>Grade Service</h1>
+          <div class="brand-sub">SOA · FastAPI · MongoDB</div>
+        </div>
+      </div>
+      <span class="tag">/grades</span>
+    </div>
+
+    <div class="title-block">
+      <h2>Manage student grades and averages.</h2>
+      <p>
+        This UI consumes the Grade microservice through your API gateway.
+        Create, update, delete grades and compute per-student averages.
+      </p>
+
+      <div class="chips-row">
+        <span class="chip">
+          <span class="chip-dot"></span>
+          FastAPI · Async Mongo
+        </span>
+        <span class="chip">
+          <span class="chip-pill">studentNumber · course_id · grade_value</span>
+        </span>
+      </div>
+    </div>
+
+    <div class="preview-card">
+      <div class="preview-header">
+        <div class="preview-main">
+          <div class="avatar">SN</div>
+          <div class="preview-text">
+            <div class="preview-name">StudentNumber</div>
+            <div class="preview-email">Loaded from /students/numbers</div>
+            <div class="preview-meta">
+              <span class="badge-soft">Type: string</span>
+              <span class="status-pill">MongoDB</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="preview-footer">
+        <span>Data below is live from the API.</span>
+        <span>Endpoint: /grades/</span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- RIGHT PANEL -->
+  <main class="right">
+    <div class="right-header">
+      <div>
+        <h2>Grades Management</h2>
+        <p>Create or update a grade, then see it instantly in the list.</p>
+      </div>
+      <span class="badge-small">
+        <span class="badge-dot"></span>
+        Connected to Grade API
+      </span>
+    </div>
+
+    <div class="nav-row">
+      <div class="nav-links">
+        <a class="nav-link outline" href="/services/student-service/f'ront-end/dashbord.html">Students</a>
+        <a class="nav-link" href="grades.html">Grades</a>
+      </div>
+      <span class="helper-text">Base URL is configurable in the script.</span>
+    </div>
+
+    <!-- FORM -->
+    <section>
+      <form id="gradeForm">
+        <input type="hidden" id="gradeId" />
+
+        <div class="field">
+          <label for="studentId">Student (studentNumber)</label>
+          <input
+            type="text"
+            id="studentId"
+            list="studentsList"
+            required
+            placeholder="e.g. 2025-GL-548"
+            autocomplete="off"
+          />
+          <datalist id="studentsList"></datalist>
+          <small>Pick from the list or type a studentNumber.</small>
+        </div>
+
+        <div class="field">
+          <label for="courseId">Course ID</label>
+          <input type="number" id="courseId" required placeholder="e.g. 101" />
+          <small>Integer ID of the course.</small>
+        </div>
+
+        <div class="field">
+          <label for="gradeValue">Grade value</label>
+          <input type="number" step="0.01" id="gradeValue" required placeholder="e.g. 15.5" />
+          <small>Numeric grade (e.g. 0–20 or 0–100).</small>
+        </div>
+
+        <div class="field">
+          <label for="averageStudentId">Average for studentNumber</label>
+          <input
+            type="text"
+            id="averageStudentId"
+            list="studentsList"
+            placeholder="(leave empty to use Student above)"
+            autocomplete="off"
+          />
+          <small>Uses the same student list.</small>
+        </div>
+
+        <div class="actions">
+          <button type="button" class="btn-secondary" id="resetFormBtn">Reset</button>
+          <button type="button" class="btn-secondary" id="averageBtn">Get average</button>
+          <button type="submit" class="btn-primary" id="submitBtn">Create grade</button>
+        </div>
+      </form>
+
+      <div class="average-box">
+        <span>Average:</span>
+        <span id="averageResult" class="average-result">–</span>
+      </div>
+    </section>
+
+    <!-- TABLE -->
+    <section>
+      <div class="table-wrapper">
+        <div class="table-header">
+          <span>All grades</span>
+          <span class="helper-text">Below is the result of GET /grades/</span>
+        </div>
+        <div class="table-scroll">
+          <table>
+            <thead>
+            <tr>
+              <th>ID</th>
+              <th>Student</th>
+              <th>Course</th>
+              <th>Grade</th>
+              <th>Date assigned</th>
+              <th>Actions</th>
+            </tr>
+            </thead>
+            <tbody id="gradesTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<script>
+  // === CONFIG ===
+  const API_BASE_URL = "http://localhost:8000";
+
+  const form = document.getElementById("gradeForm");
+  const gradeIdInput = document.getElementById("gradeId");
+  const studentIdInput = document.getElementById("studentId");
+  const courseIdInput = document.getElementById("courseId");
+  const gradeValueInput = document.getElementById("gradeValue");
+  const averageStudentIdInput = document.getElementById("averageStudentId");
+  const averageResultSpan = document.getElementById("averageResult");
+  const gradesTableBody = document.getElementById("gradesTableBody");
+  const resetFormBtn = document.getElementById("resetFormBtn");
+  const averageBtn = document.getElementById("averageBtn");
+  const submitBtn = document.getElementById("submitBtn");
+  const studentsList = document.getElementById("studentsList");
+
+  async function apiGet(path) {
+    const res = await fetch(API_BASE_URL + path);
+    if (!res.ok) throw new Error(res.status + " " + res.statusText);
+    return res.json();
+  }
+
+  async function apiSend(method, path, body) {
+    const res = await fetch(API_BASE_URL + path, {
+      method,
+      headers: { "Content-Type": "application/json" },
+      body: body ? JSON.stringify(body) : undefined
+    });
+    if (!res.ok) {
+      const text = await res.text().catch(() => "");
+      throw new Error(method + " " + path + " → " + res.status + " " + text);
+    }
+    return res.json();
+  }
+
+  function formatDateTime(value) {
+    if (!value) return "";
+    const d = new Date(value);
+    if (isNaN(d)) return value;
+    return d.toLocaleString();
+  }
+
+  function clearForm() {
+    gradeIdInput.value = "";
+    studentIdInput.value = "";
+    courseIdInput.value = "";
+    gradeValueInput.value = "";
+    submitBtn.textContent = "Create grade";
+  }
+
+  function fillFormFromRow(grade) {
+    gradeIdInput.value = grade.id;
+    studentIdInput.value = grade.student_id;
+    courseIdInput.value = grade.course_id;
+    gradeValueInput.value = grade.grade_value;
+    submitBtn.textContent = "Update grade";
+  }
+
+  async function loadStudents() {
+    studentsList.innerHTML = "";
+    try {
+      const numbers = await apiGet("/students/numbers");
+      numbers.forEach(sn => {
+        const opt = document.createElement("option");
+        opt.value = sn;
+        studentsList.appendChild(opt);
+      });
+    } catch (err) {
+      console.error(err);
+      // Keep UI usable even if students list fails
+    }
+  }
+
+  async function loadGrades() {
+    gradesTableBody.innerHTML = "<tr><td colspan='6'>Loading…</td></tr>";
+    try {
+      const data = await apiGet("/grades/");
+      gradesTableBody.innerHTML = "";
+      if (!Array.isArray(data) || data.length === 0) {
+        gradesTableBody.innerHTML = "<tr><td colspan='6'>No grades yet.</td></tr>";
+        return;
+      }
+      data.forEach(g => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${g.id}</td>
+          <td>${g.student_id}</td>
+          <td>${g.course_id}</td>
+          <td>${g.grade_value}</td>
+          <td>${formatDateTime(g.date_assigned)}</td>
+          <td>
+            <button type="button" class="btn-secondary btn-table" data-action="edit" data-id="${g.id}">Edit</button>
+            <button type="button" class="btn-danger btn-table" data-action="delete" data-id="${g.id}">Delete</button>
+          </td>
+        `;
+        gradesTableBody.appendChild(tr);
+      });
+    } catch (err) {
+      console.error(err);
+      gradesTableBody.innerHTML = "<tr><td colspan='6'>Error loading grades.</td></tr>";
+    }
+  }
+
+  async function handleSaveGrade(e) {
+    e.preventDefault();
+
+    // ✅ student_id is a STRING studentNumber
+    const student_id = (studentIdInput.value || "").trim();
+    const course_id = Number(courseIdInput.value);
+    const grade_value = Number(gradeValueInput.value);
+
+    if (!student_id || !course_id || isNaN(grade_value)) {
+      alert("Please fill studentNumber, course and grade value.");
+      return;
+    }
+
+    const payload = { student_id, course_id, grade_value };
+
+    try {
+      if (gradeIdInput.value) {
+        await apiSend("PUT", "/grades/" + gradeIdInput.value, payload);
+      } else {
+        await apiSend("POST", "/grades/", payload);
+      }
+      clearForm();
+      await loadGrades();
+    } catch (err) {
+      console.error(err);
+      alert("Error saving grade: " + err.message);
+    }
+  }
+
+  async function handleTableClick(e) {
+    const btn = e.target.closest("button[data-action]");
+    if (!btn) return;
+
+    const id = btn.getAttribute("data-id");
+    const action = btn.getAttribute("data-action");
+
+    if (action === "edit") {
+      try {
+        const g = await apiGet("/grades/" + id);
+        fillFormFromRow(g);
+      } catch (err) {
+        console.error(err);
+        alert("Error loading grade: " + err.message);
+      }
+    } else if (action === "delete") {
+      if (!confirm("Delete this grade?")) return;
+      try {
+        await apiSend("DELETE", "/grades/" + id);
+        await loadGrades();
+      } catch (err) {
+        console.error(err);
+        alert("Error deleting grade: " + err.message);
+      }
+    }
+  }
+
+  async function handleAverage() {
+    const studentNumber =
+      (averageStudentIdInput.value || "").trim() ||
+      (studentIdInput.value || "").trim();
+
+    if (!studentNumber) {
+      alert("Enter a studentNumber for the average.");
+      return;
+    }
+
+    try {
+      const data = await apiGet("/grades/student/" + encodeURIComponent(studentNumber) + "/average");
+      averageResultSpan.textContent = Number(data.average).toFixed(2);
+    } catch (err) {
+      console.error(err);
+      averageResultSpan.textContent = "Error";
+      alert("Error fetching average: " + err.message);
+    }
+  }
+
+  // events
+  form.addEventListener("submit", handleSaveGrade);
+  gradesTableBody.addEventListener("click", handleTableClick);
+  resetFormBtn.addEventListener("click", clearForm);
+  averageBtn.addEventListener("click", handleAverage);
+
+  // init
+  loadStudents();
+  loadGrades();
+</script>
+
+</body>
+</html>
